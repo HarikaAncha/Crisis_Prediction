@@ -1,0 +1,759 @@
+---
+title: "Project Applied Stats Final"
+author: "Harika Ancha"
+date: "November 24, 2018"
+output: html_notebook
+
+---
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Preview** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+```{r}
+library(car)
+options(scipen=999)
+getwd()
+```
+
+```{r}
+standardize_df <- function(df) {
+  df$Adj.Close <- (df$Adj.Close - mean(df$Adj.Close)) / sd(df$Adj.Close)
+  df
+}
+```
+
+```{r}
+aig_daily_tmp <- read.table("data/aig-daily.txt", header = TRUE, stringsAsFactors = FALSE)
+
+aig_daily <- read.table("data/aig.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+xlf <- read.table("data/xlf.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+citi <- read.table("data/c.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+bac <- read.table("data/bac.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+skf <- read.table("data/skf.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+fannie_mae <- read.table("data/fnma.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+freddie_mac <- read.table("data/fmcc.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+spy <- read.table("data/spy.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+xlf$Date <- as.Date(xlf$Date, "%Y-%m-%d")
+citi$Date <- as.Date(citi$Date, "%Y-%m-%d")
+bac$Date <- as.Date(bac$Date, "%Y-%m-%d")
+skf$Date <- as.Date(skf$Date, "%Y-%m-%d")
+fannie_mae$Date <- as.Date(fannie_mae$Date, "%Y-%m-%d")
+freddie_mac$Date <- as.Date(freddie_mac$Date, "%Y-%m-%d")
+aig_daily$Date <- as.Date(aig_daily$Date, "%Y-%m-%d")
+spy$Date <- as.Date(spy$Date, "%Y-%m-%d")
+
+aig_daily$Year <- aig_daily_tmp$Year
+xlf$Year <- aig_daily$Year
+citi$Year <- aig_daily$Year
+bac$Year <- aig_daily$Year
+fannie_mae$Year <- aig_daily$Year
+freddie_mac$Year <- aig_daily$Year
+
+aig_monthly <- read.table("data/aig_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+aig_monthly$id <- 1:nrow(aig_monthly)
+aig_monthly$Date <- as.Date(aig_monthly$Date, "%Y-%m-%d")
+
+xlf_monthly <- read.table("data/xlf_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+xlf_monthly$id <- 1:nrow(xlf_monthly)
+xlf_monthly$Date <- as.Date(xlf_monthly$Date, "%Y-%m-%d")
+
+fannie_mae_monthly <- read.table("data/fannie_mae_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+fannie_mae_monthly$id <- 1:nrow(fannie_mae_monthly)
+fannie_mae_monthly$Date <- as.Date(fannie_mae_monthly$Date, "%Y-%m-%d")
+
+freddie_mac_monthly <- read.table("data/freddie_mac_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+freddie_mac_monthly$id <- 1:nrow(freddie_mac_monthly)
+freddie_mac_monthly$Date <- as.Date(freddie_mac_monthly$Date, "%Y-%m-%d")
+
+bac_monthly <- read.table("data/bac_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+bac_monthly$id <- 1:nrow(bac_monthly)
+bac_monthly$Date <- as.Date(bac_monthly$Date, "%Y-%m-%d")
+
+citi_monthly <- read.table("data/citi_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+citi_monthly$id <- 1:nrow(citi_monthly)
+citi_monthly$Date <- as.Date(citi_monthly$Date, "%Y-%m-%d")
+
+spy_monthly <- read.table("data/spy_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+spy_monthly$id <- 1:nrow(spy_monthly)
+spy_monthly$Date <- as.Date(spy_monthly$Date, "%Y-%m-%d")
+
+aig_monthly <- standardize_df(aig_monthly)
+xlf_monthly <- standardize_df(xlf_monthly)
+bac_monthly <- standardize_df(bac_monthly)
+spy_monthly <- standardize_df(spy_monthly)
+citi_monthly <- standardize_df(citi_monthly)
+fannie_mae_monthly <- standardize_df(fannie_mae_monthly)
+freddie_mac_monthly <- standardize_df(freddie_mac_monthly)
+
+home_prices_monthly <- read.table("data/HPIPONM226S.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+home_prices_monthly$id <- 1:nrow(home_prices_monthly)
+home_prices_monthly$Date <- as.Date(home_prices_monthly$Date, "%Y-%m-%d")
+
+fed_rates_monthly <- read.table("data/FEDFUNDS.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+fed_rates_monthly$id <- 1:nrow(fed_rates_monthly)
+fed_rates_monthly$Date <- as.Date(fed_rates_monthly$Date, "%Y-%m-%d")
+
+home_prices_monthly_till_2007_df <- subset(home_prices_monthly, home_prices_monthly$Date <= "2007-12-31")
+
+fed_rates_monthly_till_2007_df <- subset(fed_rates_monthly, fed_rates_monthly$Date <= "2007-12-31")
+
+bank_equity_asset_rates_df <- read.table("data/EQTA.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+bank_equity_asset_rates_df$Date <- as.Date(bank_equity_asset_rates_df$Date, "%Y-%m-%d")
+
+unemployment_rate_monthly_df <- read.table("data/unemployment_rate_monthly.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+
+monthly_treasure_yield_df <- read.table("data/monthly_csv.csv", header = TRUE, stringsAsFactors = FALSE, sep = ",")
+monthly_treasure_yield_df$Date <- as.Date(monthly_treasure_yield_df$Date, "%Y-%m-%d")
+
+```
+
+```{r}
+library('corrplot') #package corrplot
+
+panel.cor <- function(x, y, digits = 2, cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  # correlation coefficient
+  r <- cor(x, y)
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste("r= ", txt, sep = "")
+  text(0.5, 0.6, txt)
+
+  # p-value calculation
+  p <- cor.test(x, y)$p.value
+  txt2 <- format(c(p, 0.123456789), digits = digits)[1]
+  txt2 <- paste("p= ", txt2, sep = "")
+  if(p<0.01) txt2 <- paste("p= ", "<0.01", sep = "")
+  text(0.5, 0.4, txt2)
+}
+
+```
+
+```{r}
+plot_graphs <- function(stockData) {
+  stockData$Date <- as.Date(stockData$Date, "%m/%d/%Y")
+  plot(Adj.Close ~ Date, stockData, xaxt = "n", type = "l")
+  axis(1, stockData$Date, format(stockData$Date, "%b %d %Y"), cex.axis = .7)
+}
+```
+
+```{r}
+plot_graphs(aig_daily)
+```
+
+```{r}
+plot_graphs(xlf)
+```
+
+```{r}
+plot_graphs(bac)
+```
+
+```{r}
+plot_graphs(citi)
+```
+
+```{r}
+plot_graphs(fannie_mae)
+```
+
+```{r}
+plot_graphs(freddie_mac)
+```
+
+```{r}
+plot_graphs(spy)
+```
+```{r}
+plot(Price~Date, home_prices_monthly, xaxt = "n", type = "l", main = "Monthly Home prices")
+  axis(1, home_prices_monthly$Date, format(home_prices_monthly$Date, "%b %d %Y"), cex.axis = .7)
+  
+```
+  
+```{r}
+plot(Rate~Date, fed_rates_monthly, xaxt = "n", type = "l", main = "Monthly Fed Rates")
+  axis(1, fed_rates_monthly$Date, format(fed_rates_monthly$Date, "%b %d %Y"), cex.axis = .7)
+  
+```
+
+```{r}
+plot(Rate~Date, monthly_treasure_yield_df, xaxt = "n", type = "l", main = "Treasure bonds yield curve")
+  axis(1, monthly_treasure_yield_df$Date, format(monthly_treasure_yield_df$Date, "%b %d %Y"), cex.axis = .7)
+  
+```
+```{r}
+plot(Ratio~Date, bank_equity_asset_rates_df, xaxt = "n", type = "l", main = "Quarterly Bank Equity Asset Ratio")
+  axis(1, bank_equity_asset_rates_df$Date, format(bank_equity_asset_rates_df$Date, "%b %d %Y"), cex.axis = .7)
+  
+```
+
+```{r}
+writeLines("\nRunning regression models on home prices vs rates\n")
+home_prices_rates_model <- lm(home_prices_monthly$Price~fed_rates_monthly$Rate)
+summary(home_prices_rates_model)
+
+writeLines("\nRunning regression models on home prices vs rates till 2007\n")
+home_prices_rates_till_2007_model <- lm(home_prices_monthly_till_2007_df$Price~fed_rates_monthly_till_2007_df$Rate)
+
+summary(home_prices_rates_till_2007_model)
+
+plot(fed_rates_monthly_till_2007_df$Rate, home_prices_monthly_till_2007_df$Price, xlab = "Fed rates", ylab = "Home prices", main = "Home prices vs Fed interest rate")
+```
+
+```{r}
+
+aig_filtered <- subset(aig_daily, aig_daily$Year >= 2006 & aig_daily$Year <= 2009)
+aig_filtered$Date <- as.Date(aig_filtered$Date, "%Y-%m-%d")
+row.names(aig_filtered) <- NULL
+plot_graphs(aig_filtered)
+#qplot(x = aig_daily$Date, y = aig_daily$Open, ylab = "Open", xlab = "Date", main = "Open vs date")
+
+```
+
+```{r}
+
+xlf_filtered <- subset(xlf, xlf$Year >= 2006 & xlf$Year <= 2009)
+
+row.names(xlf_filtered) <- NULL
+xlf_filtered$Date <- as.Date(xlf_filtered$Date, "%Y-%m-%d")
+plot_graphs(xlf_filtered)
+
+```
+
+```{r}
+bac_filtered <- subset(bac, bac$Year >= 2006 & bac$Year <= 2009)
+row.names(bac_filtered) <- NULL
+bac_filtered$Date <- as.Date(bac_filtered$Date, "%Y-%m-%d")
+plot_graphs(bac_filtered)
+```
+
+```{r}
+citi_filtered <- subset(citi, citi$Year >= 2006 & citi$Year <= 2009)
+row.names(citi_filtered) <- NULL
+citi_filtered$Date <- as.Date(citi_filtered$Date, "%Y-%m-%d")
+plot_graphs(citi_filtered)
+```
+
+```{r}
+fannie_filtered <- subset(fannie_mae, fannie_mae$Year >= 2006 & fannie_mae$Year <= 2009)
+row.names(fannie_filtered) <- NULL
+fannie_filtered$Date <- as.Date(fannie_filtered$Date, "%Y-%m-%d")
+plot_graphs(fannie_filtered)
+```
+
+```{r}
+freddie_filtered <- subset(freddie_mac, freddie_mac$Year >= 2006 & freddie_mac$Year <= 2009)
+row.names(freddie_filtered) <- NULL
+freddie_filtered$Date <- as.Date(freddie_filtered$Date, "%Y-%m-%d")
+plot_graphs(freddie_filtered)
+```
+
+```{r}
+time_series_regression = function(stock_data, xlabel, ylabel, title) {
+  filtered_till_2007 <- subset(stock_data, stock_data$Date < "2007-12-31")
+  
+  till_2007_model <- lm(Adj.Close~id, data = filtered_till_2007)
+
+  plot(filtered_till_2007$id, filtered_till_2007$Adj.Close, pch = 16, cex = 1.3, col = "black", main = paste(title, "(Till Dec 2007)", sep = " "), xlab = xlabel, ylab = ylabel)
+
+  abline(till_2007_model$coefficients[1], till_2007_model$coefficients[2], col = "blue")
+  
+  filtered_2007_2010 <- subset(stock_data, stock_data$Date >= "2007-01-01" & stock_data$Date < "2010-12-31")
+  
+  filtered_2007_2010$id <- 1:nrow(filtered_2007_2010)
+  
+  between_2007_2010_model <- lm(Adj.Close~id, data = filtered_2007_2010)
+  
+  plot(filtered_2007_2010$id, filtered_2007_2010$Adj.Close, pch = 16, cex = 1.3, col = "black", main = paste(title, "(Between 2007 and 2010)", sep = " "), xlab = xlabel, ylab = ylabel)
+  
+  abline(between_2007_2010_model$coefficients[1], between_2007_2010_model$coefficients[2], col = "blue")
+
+  return(list(till_2007_model, between_2007_2010_model))
+}
+
+```
+
+## Time series regression for AIG
+```{r}
+models_aig <- time_series_regression(aig_monthly, "Sequence number", "Stock Closing Price", "Adjusted Stock Close. Time series plot AIG ")
+```
+
+## Time series regression for AIG till 2007-12-31
+```{r}
+till_2007_aig_model <- models_aig[[1]]
+writeLines("Printing summary for AIG model till 2007")
+summary(till_2007_aig_model)
+
+```
+
+## Time series regression for AIG from 2007-01-01 till 2010-12-31
+```{r}
+writeLines("Printing summary for AIG model between 2007 and 2010")
+summary(models_aig[[2]])
+
+```
+
+## Time series regression for XLF
+```{r}
+models_xlf <- time_series_regression(xlf_monthly, "Sequence number", "Stock Closing Price", "Adjusted Stock Close. Time series plot XLF ")
+```
+
+## Time series regression for XLF till 2007-12-31
+```{r}
+writeLines("Printing summary for XLF model till 2007")
+summary(models_xlf[[1]])
+
+```
+
+## Time series regression for XLF from 2007-01-01 till 2010-12-31
+```{r}
+writeLines("Printing summary for XLF model between 2007 and 2010")
+summary(models_xlf[[2]])
+
+```
+## Time series regression for Fannie Mae
+```{r}
+models_fannie <- time_series_regression(fannie_mae_monthly, "Sequence number", "Stock Closing Price", "Stock Close. Time series plot Fannie Mae ")
+```
+
+## Time series regression for Fannie Mae till 2007-12-31
+```{r}
+writeLines("Printing summary for Fannie Mae model till 2007")
+summary(models_fannie[[1]])
+```
+
+## Time series regression for Fannie Mae from 2007-01-01 till 2010-12-31
+```{r}
+writeLines("Printing summary for Fannie Mae model between 2007 and 2010")
+summary(models_fannie[[2]])
+
+```
+
+
+## Time series regression for SPY (SPDR S&P 500 ETF)
+```{r}
+models_spy <- time_series_regression(spy_monthly, "Sequence number", "Stock Closing Price", "Stock Close. Time series plot SPY (SPDR S&P 500 ETF) ")
+```
+
+## Time series regression for SPY till 2007-12-31
+```{r}
+writeLines("Printing summary for SPY model till 2007")
+summary(models_spy[[1]])
+```
+
+## Time series regression for SPY from 2007-01-01 till 2010-12-31
+```{r}
+writeLines("Printing summary for SPY model between 2007 and 2010")
+summary(models_spy[[2]])
+
+```
+
+```{r}
+
+writeLines("Combining all stocks we are tracking into a single Dataframe for analysis")
+
+stocks_df <- data.frame(row.names = 1:nrow(aig_daily))
+stocks_df$aig <- aig_daily$Adj.Close
+stocks_df$xlf <- xlf$Adj.Close
+stocks_df$bac <- bac$Adj.Close
+stocks_df$citi <- citi$Adj.Close
+stocks_df$fnma <- fannie_mae$Adj.Close
+stocks_df$freddie <- freddie_mac$Adj.Close
+stocks_df$Year <- aig_daily$Year
+
+stocks_df_till_2007 <- subset(stocks_df, stocks_df$Year <= 2007)
+
+stocks_df_between_2007_and_2009 <- subset(stocks_df, stocks_df$Year >= 2007 & stocks_df$Year <= 2009)
+
+stocks_df_between_2009_and_2013 <- subset(stocks_df, stocks_df$Year >= 2009 & stocks_df$Year <= 2013)
+
+stocks_monthly_df <- data.frame(row.names = 1:nrow(aig_monthly))
+stocks_monthly_df$aig <- aig_monthly$Adj.Close
+stocks_monthly_df$xlf <- xlf_monthly$Adj.Close
+stocks_monthly_df$bac <- bac_monthly$Adj.Close
+stocks_monthly_df$citi <- citi_monthly$Adj.Close
+stocks_monthly_df$fnma <- fannie_mae_monthly$Adj.Close
+stocks_monthly_df$freddie <- freddie_mac_monthly$Adj.Close
+stocks_monthly_df$id <- aig_monthly$id
+stocks_monthly_df$Rate <- fed_rates_monthly$Rate
+stocks_monthly_df$spy <- spy_monthly$Adj.Close
+stocks_monthly_df$Date <- aig_monthly$Date
+
+stocks_monthly_till_2007_df <- subset(stocks_monthly_df, stocks_monthly_df$Date <= "2007-12-31")
+stocks_monthly_between_2007_and_2009_df <- subset(stocks_monthly_df, stocks_monthly_df$Date >= "2007-01-01" & stocks_monthly_df$Date <= "2010-12-31")
+stocks_monthly_from_2009_df <- subset(stocks_monthly_df, stocks_monthly_df$Date >= "2009-01-01")
+
+```
+
+
+```{r}
+require(leaps)
+
+writeLines("\nUsing regsubsets to identify best predictors for complete monthly stock data\n")
+reg_monthly <- regsubsets(aig~xlf+citi+bac+fnma+freddie+Rate, data = stocks_monthly_df)
+summary(reg_monthly)
+
+writeLines("\nUsing regsubsets to identify best predictors for monthly stock data till 2007\n")
+reg_monthly_till_2007 <- regsubsets(aig~xlf+citi+bac+fnma+freddie+Rate, data = stocks_monthly_till_2007_df)
+summary(reg_monthly_till_2007)
+
+```
+```{r}
+library(psych)
+
+writeLines("Printing correlations between all monthly stock prices till 2007")
+pairs.panels(stocks_monthly_till_2007_df)
+
+```
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG and XLF, Fannie Mae and Interest Rates till 2007")
+
+fit_monthly_xlf_fannie_rate_till_2007 <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_till_2007_df)
+summary(fit_monthly_xlf_fannie_rate_till_2007)
+vif(fit_monthly_xlf_fannie_rate_till_2007)
+plot(stocks_monthly_till_2007_df$aig, predict(fit_monthly_xlf_fannie_rate_till_2007), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly till 2007 with XLF, Fannie Mae and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_xlf_fannie_rate_till_2007)
+plot(res~stocks_monthly_till_2007_df$aig+stocks_monthly_till_2007_df$xlf+stocks_monthly_till_2007_df$fnma+stocks_monthly_till_2007_df$Rate)
+qqnorm(res)
+#qqline(res)
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, SPY, Rate till 2007")
+
+fit_monthly_spy_rate_till_2007 <- lm(aig~spy+Rate, data = stocks_monthly_till_2007_df)
+summary(fit_monthly_spy_rate_till_2007)
+vif(fit_monthly_spy_rate_till_2007)
+plot(stocks_monthly_till_2007_df$aig, predict(fit_monthly_spy_rate_till_2007), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly till 2007 with SPY and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_rate_till_2007)
+plot(res~stocks_monthly_till_2007_df$aig+stocks_monthly_till_2007_df$spy+stocks_monthly_till_2007_df$Rate)
+qqnorm(res)
+#qqline(res)
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY and Rate for the period till 2007")
+
+fit_monthly_spy_vs_rate_till_2007 <- lm(spy~Rate, data = stocks_monthly_till_2007_df)
+summary(fit_monthly_spy_vs_rate_till_2007)
+vif(fit_monthly_spy_vs_rate_till_2007)
+plot(stocks_monthly_till_2007_df$spy, predict(fit_monthly_spy_vs_rate_till_2007), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly with SPY and Rate till 2007", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_vs_rate_till_2007)
+plot(res~stocks_monthly_till_2007_df$spy+stocks_monthly_till_2007_df$Rate)
+qqnorm(res)
+#qqline(res)
+```
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY, AIG and Fannie Mae till 2007")
+
+fit_monthly_spy_vs_aig_and_fnma_till_2007 <- lm(spy~aig+fnma, data = stocks_monthly_till_2007_df)
+summary(fit_monthly_spy_vs_aig_and_fnma_till_2007)
+vif(fit_monthly_spy_vs_aig_and_fnma_till_2007)
+plot(stocks_monthly_till_2007_df$spy, predict(fit_monthly_spy_vs_aig_and_fnma_till_2007), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly till 2007 with SPY and AIG, Fannie Mae", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_vs_aig_and_fnma_till_2007)
+plot(res~stocks_monthly_till_2007_df$spy+stocks_monthly_till_2007_df$aig+stocks_monthly_till_2007_df$fnma)
+qqnorm(res)
+#qqline(res)
+```
+
+```{r}
+library(psych)
+
+writeLines("Printing correlations between all monthly stock prices.")
+pairs.panels(stocks_monthly_df)
+
+```
+```{r}
+writeLines("Running linear regression using all monthly stock data between AIG and XLF, Fannie Mae and Rate")
+
+fit_monthly_xlf_fannie_rate <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_df)
+summary(fit_monthly_xlf_fannie_rate)
+vif(fit_monthly_xlf_fannie_rate)
+plot(stocks_monthly_df$aig, predict(fit_monthly_xlf_fannie_rate), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly with XLF, Fannie Mae and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_xlf_fannie_rate)
+plot(res~stocks_monthly_df$aig+stocks_monthly_df$xlf+stocks_monthly_df$fnma+stocks_monthly_df$Rate)
+qqnorm(res)
+#qqline(res)
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, SPY, Rate")
+
+fit_monthly_spy_rate <- lm(aig~spy+Rate, data = stocks_monthly_df)
+summary(fit_monthly_spy_rate)
+vif(fit_monthly_spy_rate)
+plot(stocks_monthly_df$aig, predict(fit_monthly_spy_rate), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly with SPY and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_rate)
+plot(res~stocks_monthly_df$aig+stocks_monthly_df$spy+stocks_monthly_df$Rate)
+qqnorm(res)
+#qqline(res)
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY, AIG and Fannie Mae")
+
+fit_monthly_spy_vs_aig_and_fnma <- lm(spy~aig+fnma, data = stocks_monthly_df)
+summary(fit_monthly_spy_vs_aig_and_fnma)
+vif(fit_monthly_spy_vs_aig_and_fnma)
+plot(stocks_monthly_df$spy, predict(fit_monthly_spy_vs_aig_and_fnma), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly with SPY and AIG, Fannie Mae", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_vs_aig_and_fnma)
+plot(res~stocks_monthly_df$spy+stocks_monthly_df$aig+stocks_monthly_df$fnma)
+qqnorm(res)
+#qqline(res)
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY and Rate")
+
+fit_monthly_spy_vs_rate <- lm(spy~Rate, data = stocks_monthly_df)
+summary(fit_monthly_spy_vs_rate)
+vif(fit_monthly_spy_vs_rate)
+plot(stocks_monthly_df$spy, predict(fit_monthly_spy_vs_rate), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly with SPY and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_vs_rate)
+plot(res~stocks_monthly_df$spy+stocks_monthly_df$Rate)
+qqnorm(res)
+#qqline(res)
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY, AIG and Fannie Mae")
+
+fit_monthly_spy_aig_fnma <- lm(spy~aig+fnma, data = stocks_monthly_df)
+summary(fit_monthly_spy_aig_fnma)
+vif(fit_monthly_spy_aig_fnma)
+plot(stocks_monthly_df$spy, predict(fit_monthly_spy_aig_fnma), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly with SPY, AIG and Fannie Mae", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_aig_fnma)
+plot(res~stocks_monthly_df$spy+stocks_monthly_df$aig+stocks_monthly_df$fnma)
+qqnorm(res)
+#qqline(res)
+```
+```{r}
+library(psych)
+
+writeLines("Printing correlations between all monthly stock prices between 2007 and 2009")
+pairs.panels(stocks_monthly_between_2007_and_2009_df)
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, XLF, Fannie Mae and Rate between 2007 and 2009")
+
+fit_monthly_aig_xlf_fnma_rate_between_2007_2009 <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_between_2007_and_2009_df)
+summary(fit_monthly_aig_xlf_fnma_rate_between_2007_2009)
+vif(fit_monthly_aig_xlf_fnma_rate_between_2007_2009)
+plot(stocks_monthly_between_2007_and_2009_df$aig, predict(fit_monthly_aig_xlf_fnma_rate_between_2007_2009), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly between 2007-2009 with XLF, Fannie Mae and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_aig_xlf_fnma_rate_between_2007_2009)
+plot(res~stocks_monthly_between_2007_and_2009_df$aig+stocks_monthly_between_2007_and_2009_df$xlf+stocks_monthly_between_2007_and_2009_df$fnma+stocks_monthly_between_2007_and_2009_df$Rate)
+qqnorm(res)
+#qqline(res)
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, SPY and Rate between 2007 and 2009")
+
+fit_monthly_spy_rate_between_2007_2009 <- lm(aig~spy+Rate, data = stocks_monthly_between_2007_and_2009_df)
+summary(fit_monthly_spy_rate_between_2007_2009)
+vif(fit_monthly_spy_rate_between_2007_2009)
+plot(stocks_monthly_between_2007_and_2009_df$aig, predict(fit_monthly_spy_rate_between_2007_2009), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly between 2007-2009 with SPY and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_rate_between_2007_2009)
+plot(res~stocks_monthly_between_2007_and_2009_df$aig+stocks_monthly_between_2007_and_2009_df$spy+stocks_monthly_between_2007_and_2009_df$Rate)
+qqnorm(res)
+#qqline(res)
+
+```
+
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY, AIG and Fannie Mae between 2007 and 2009")
+
+fit_monthly_spy_aig_fnma_between_2007_2009 <- lm(spy~aig+fnma, data = stocks_monthly_between_2007_and_2009_df)
+summary(fit_monthly_spy_aig_fnma_between_2007_2009)
+vif(fit_monthly_spy_aig_fnma_between_2007_2009)
+plot(stocks_monthly_between_2007_and_2009_df$aig, predict(fit_monthly_spy_aig_fnma_between_2007_2009), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly between 2007-2009 with AIG and Fannie Mae", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_aig_fnma_between_2007_2009)
+plot(res~stocks_monthly_between_2007_and_2009_df$spy+stocks_monthly_between_2007_and_2009_df$aig+stocks_monthly_between_2007_and_2009_df$fnma)
+qqnorm(res)
+#qqline(res)
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY and Rate between 2007 and 2009")
+
+fit_monthly_spy_vs_rate_between_2007_2009 <- lm(spy~Rate, data = stocks_monthly_between_2007_and_2009_df)
+summary(fit_monthly_spy_vs_rate_between_2007_2009)
+vif(fit_monthly_spy_vs_rate_between_2007_2009)
+plot(stocks_monthly_between_2007_and_2009_df$spy, predict(fit_monthly_spy_vs_rate_between_2007_2009), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly with SPY and Rate between 2007 and 2009", abline(a = 0, b = 1, col = "red"))
+
+res<-residuals(fit_monthly_spy_vs_rate_between_2007_2009)
+plot(res~stocks_monthly_between_2007_and_2009_df$spy+stocks_monthly_between_2007_and_2009_df$Rate)
+qqnorm(res)
+#qqline(res)
+```
+
+```{r}
+library(psych)
+
+writeLines("Printing correlations between all monthly stock prices after 2009")
+pairs.panels(stocks_monthly_from_2009_df)
+
+```
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, XLF, Fannie Mae and Rate from 2009")
+
+fit_monthly_xlf_fnma_rate_from_2009 <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_from_2009_df)
+summary(fit_monthly_xlf_fnma_rate_from_2009)
+vif(fit_monthly_xlf_fnma_rate_from_2009)
+plot(stocks_monthly_from_2009_df$aig, predict(fit_monthly_xlf_fnma_rate_from_2009), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly from 2009 with XLF, Fannie Mae, Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_xlf_fnma_rate_from_2009)
+plot(res~stocks_monthly_from_2009_df$aig+stocks_monthly_from_2009_df$xlf+stocks_monthly_from_2009_df$fnma+stocks_monthly_from_2009_df$Rate)
+qqnorm(res)
+#qqline(res)
+
+```
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, SPY and Rate from 2009 ")
+
+fit_monthly_spy_rate_from_2009 <- lm(aig~spy+Rate, data = stocks_monthly_from_2009_df)
+summary(fit_monthly_spy_rate_from_2009)
+vif(fit_monthly_spy_rate_from_2009)
+plot(stocks_monthly_from_2009_df$aig, predict(fit_monthly_spy_rate_from_2009), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly from 2009 with SPY and Rate", abline(a = 0, b = 1, col = "red"))
+res<-residuals(fit_monthly_spy_rate_from_2009)
+plot(res~stocks_monthly_from_2009_df$aig+stocks_monthly_from_2009_df$spy+stocks_monthly_from_2009_df$Rate)
+qqnorm(res)
+#qqline(res)
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY, AIG and Fannie Mae from 2009 ")
+
+fit_monthly_spy_aig_fnma_from_2009 <- lm(spy~aig+fnma, data = stocks_monthly_from_2009_df)
+summary(fit_monthly_spy_aig_fnma_from_2009)
+vif(fit_monthly_spy_aig_fnma_from_2009)
+plot(stocks_monthly_from_2009_df$spy, predict(fit_monthly_spy_aig_fnma_from_2009), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly from 2009 between SPY, AIG and Fannie Mae", abline(a = 0, b = 1, col = "red"))
+
+res<-residuals(fit_monthly_spy_aig_fnma_from_2009)
+plot(res~stocks_monthly_from_2009_df$spy+stocks_monthly_from_2009_df$aig+stocks_monthly_from_2009_df$fnma)
+qqnorm(res)
+#qqline(res)
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between SPY and Rate from 2009 ")
+
+fit_monthly_spy_rate_from_2009 <- lm(spy~Rate, data = stocks_monthly_from_2009_df)
+summary(fit_monthly_spy_rate_from_2009)
+vif(fit_monthly_spy_rate_from_2009)
+plot(stocks_monthly_from_2009_df$spy, predict(fit_monthly_spy_rate_from_2009), xlab="Observed SPY stock",
+     ylab = "Predicted SPY stock", main = "Regression model monthly from 2009 between SPY and Rate", abline(a = 0, b = 1, col = "red"))
+
+res<-residuals(fit_monthly_spy_rate_from_2009)
+plot(res~stocks_monthly_from_2009_df$spy+stocks_monthly_from_2009_df$Rate)
+qqnorm(res)
+#qqline(res)
+
+```
+```{r}
+reg_monthly_model <- lm(aig~xlf+fnma+freddie+Rate, data = stocks_monthly_df)
+summary(reg_monthly_model)
+
+reg_monthly_model_without_freddie <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_df)
+summary(reg_monthly_model_without_freddie)
+
+reg_monthly_model_with_xlf_fnma_rate <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_df)
+summary(reg_monthly_model_with_xlf_fnma_rate)
+library(car)
+vif(reg_monthly_model_with_xlf_fnma_rate)
+
+library(leaps)
+reg_monthly <- regsubsets(aig~xlf+citi+bac+fnma+freddie+Rate, data = stocks_monthly_df)
+
+b<-regsubsets(aig~xlf+citi+bac+fnma+freddie+Rate,data = stocks_monthly_df,nbest=3,intercept=TRUE,method=c("exhaustive", "backward", "forward", "seqrep"))
+
+reg_monthly_model_with_fred_fnma_citi <- lm(aig~fnma+citi, data = stocks_monthly_df)
+summary(reg_monthly_model_with_fred_fnma_citi)
+vif(reg_monthly_model_with_fred_fnma_citi)
+
+res<-residuals(reg_monthly_model_with_xlf_fnma_rate)
+
+plot(res~stocks_monthly_df$aig+stocks_monthly_df$fnma+stocks_monthly_df$freddie+stocks_monthly_df$citi)
+qqnorm(res)
+
+reg_monthly_first_model_stocks_monthly_from_2009_df <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_from_2009_df)
+summary(reg_monthly_model_without_freddie)
+
+reg_monthly_first_model_stocks_monthly_df <- lm(aig~xlf+fnma+Rate, data = stocks_monthly_df)
+summary(reg_monthly_first_model_stocks_monthly_df)
+res<-residuals(reg_monthly_model_with_xlf_fnma_rate)
+plot(res~stocks_monthly_df$aig+stocks_monthly_df$fnma+stocks_monthly_df$xlf)
+qqnorm(res)
+#qqline(res)
+
+```
+
+*** Please note that these models are for completion purposes only. We are not using them in the doc.
+
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, SPY, Fannie Mae till 2007")
+
+fit_monthly_spy_fnma_till_2007 <- lm(aig~spy+fnma, data = stocks_monthly_till_2007_df)
+summary(fit_monthly_spy_fnma_till_2007)
+
+plot(stocks_monthly_till_2007_df$aig, predict(fit_monthly_spy_fnma_till_2007), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly till 2007 with SPY and Fannie Mae", abline(a = 0, b = 1, col = "red"))
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, SPY and Fannie Mae between 2007 and 2009")
+
+fit_monthly_spy_fnma_between_2007_2009 <- lm(aig~spy+fnma, data = stocks_monthly_between_2007_and_2009_df)
+summary(fit_monthly_spy_fnma_between_2007_2009)
+
+plot(stocks_monthly_between_2007_and_2009_df$aig, predict(fit_monthly_spy_fnma_between_2007_2009), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly between 2007-2009 with SPY and Fannie Mae", abline(a = 0, b = 1, col = "red"))
+
+```
+
+```{r}
+writeLines("Running linear regression using monthly stock data between AIG, SPY and Fannie Mae from 2009 ")
+
+fit_monthly_spy_fnma_from_2009 <- lm(aig~spy+fnma, data = stocks_monthly_from_2009_df)
+summary(fit_monthly_spy_fnma_from_2009)
+
+plot(stocks_monthly_from_2009_df$aig, predict(fit_monthly_spy_fnma_from_2009), xlab="Observed AIG stock",
+     ylab = "Predicted AIG stock", main = "Regression model monthly from 2009 with SPY and Fannie Mae", abline(a = 0, b = 1, col = "red"))
+
+```
